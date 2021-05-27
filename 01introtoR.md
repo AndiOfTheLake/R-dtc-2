@@ -300,3 +300,171 @@ mean(non_us_some)
 ## [1] 281.15
 ```
 
+## nominal categorical variable and ordinal categorical variable
+
+
+```r
+# Animals
+animals_vector <- c("Elephant", "Giraffe", "Donkey", "Horse")
+factor_animals_vector <- factor(animals_vector)
+factor_animals_vector
+```
+
+```
+## [1] Elephant Giraffe  Donkey   Horse   
+## Levels: Donkey Elephant Giraffe Horse
+```
+
+```r
+# Temperature
+temperature_vector <- c("High", "Low", "High","Low", "Medium")
+factor_temperature_vector <- factor(temperature_vector, order = TRUE, levels = c("Low", "Medium", "High"))
+factor_temperature_vector
+```
+
+```
+## [1] High   Low    High   Low    Medium
+## Levels: Low < Medium < High
+```
+
+## Factor levels
+
+
+```r
+# Code to build factor_survey_vector
+survey_vector <- c("M", "F", "F", "M", "M")
+factor_survey_vector <- factor(survey_vector)
+factor_survey_vector
+```
+
+```
+## [1] M F F M M
+## Levels: F M
+```
+
+```r
+# Specify the levels of factor_survey_vector
+levels(factor_survey_vector) <-c("Female", "Male")
+
+factor_survey_vector
+```
+
+```
+## [1] Male   Female Female Male   Male  
+## Levels: Female Male
+```
+
+
+## Summarizing a factor
+
+
+```r
+# Build factor_survey_vector with clean levels
+survey_vector <- c("M", "F", "F", "M", "M")
+factor_survey_vector <- factor(survey_vector)
+levels(factor_survey_vector) <- c("Female", "Male")
+factor_survey_vector
+```
+
+```
+## [1] Male   Female Female Male   Male  
+## Levels: Female Male
+```
+
+```r
+# Generate summary for survey_vector
+summary(survey_vector)
+```
+
+```
+##    Length     Class      Mode 
+##         5 character character
+```
+
+```r
+# Generate summary for factor_survey_vector
+summary(factor_survey_vector)
+```
+
+```
+## Female   Male 
+##      2      3
+```
+
+## Battle of the sexes
+
+
+```r
+# Build factor_survey_vector with clean levels
+survey_vector <- c("M", "F", "F", "M", "M")
+factor_survey_vector <- factor(survey_vector)
+levels(factor_survey_vector) <- c("Female", "Male")
+
+# Male
+male <- factor_survey_vector[1]
+
+# Female
+female <- factor_survey_vector[2]
+
+# Battle of the sexes: Male 'larger' than female?
+male > female
+```
+
+```
+## Warning in Ops.factor(male, female): '>' not meaningful for factors
+```
+
+```
+## [1] NA
+```
+
+## Ordered factors
+
+
+```r
+# Create speed_vector
+speed_vector <- c("medium", "slow", "slow", "medium", "fast")
+
+# Convert speed_vector to ordered factor vector
+factor_speed_vector <-factor(speed_vector, ordered = TRUE, levels = c("slow", "medium", "fast"))
+
+# Print factor_speed_vector
+factor_speed_vector
+```
+
+```
+## [1] medium slow   slow   medium fast  
+## Levels: slow < medium < fast
+```
+
+```r
+summary(factor_speed_vector)
+```
+
+```
+##   slow medium   fast 
+##      2      2      1
+```
+
+## Comparing ordered factors
+
+
+```r
+# Create factor_speed_vector
+speed_vector <- c("medium", "slow", "slow", "medium", "fast")
+factor_speed_vector <- factor(speed_vector, ordered = TRUE, levels = c("slow", "medium", "fast"))
+
+# Factor value for second data analyst
+da2 <-factor_speed_vector[2]
+
+# Factor value for fifth data analyst
+da5 <-factor_speed_vector[5]
+
+# Is data analyst 2 faster than data analyst 5?
+da2 > da5
+```
+
+```
+## [1] FALSE
+```
+
