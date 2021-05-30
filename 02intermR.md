@@ -1,7 +1,7 @@
 ---
 title: "02 Intermediate R"
 author: "Andi"
-Last updated: "27 May, 2021"
+Last updated: "29 May, 2021"
 output: 
   html_document: 
     keep_md: yes
@@ -694,14 +694,8 @@ print(rcount)
 
 ```r
 # Consult the documentation on the mean() function
-?mean
-```
+# ?mean
 
-```
-## starting httpd help server ... done
-```
-
-```r
 # Inspect the arguments of the mean() function
 args(mean)
 ```
@@ -772,4 +766,338 @@ mean(abs(linkedin - facebook), na.rm = T)
 ## [1] 4.8
 ```
 
+## Writing functions
+
+Using `return()` inside an `if` statement is a bit like using `break` inside an `if` statement. 
+
+There are situations in which your function does not require an input. Let's say you want to write a function that gives us the random outcome of throwing a fair die:
+
+
+```r
+set.seed(528)
+
+throw_die <- function() {
+  number <- sample(1:6, size = 1)
+  number
+}
+
+throw_die()
+```
+
+```
+## [1] 3
+```
+
+code a function that doesn't take any arguments
+
+
+```r
+# Define the function hello()
+hello <- function(){
+    print("Hi there!")
+    return(TRUE)
+}
+
+# Call the function hello()
+hello()
+```
+
+```
+## [1] "Hi there!"
+```
+
+```
+## [1] TRUE
+```
+
+## A function with default arguments
+
+
+```r
+# Finish the pow_two() function
+pow_two <- function(x, print_info = TRUE) {
+  y <- x ^ 2
+  if (print_info == TRUE) {
+    print(paste(x, "to the power two equals", y))
+    }
+  return(y)
+}
+
+pow_two(3)
+```
+
+```
+## [1] "3 to the power two equals 9"
+```
+
+```
+## [1] 9
+```
+
+```r
+pow_two(3, print_info = FALSE)
+```
+
+```
+## [1] 9
+```
+
+## Function scoping
+
+Whatever variable defined inside the function is not available to call from outside the function.
+
+## A more advanced function
+
+
+```r
+# Back to the linkedin and facebook vectors 
+
+# Define the interpret function
+interpret <- function(num_views) {
+  if (num_views > 15) {
+    print("You're popular!")
+    return(num_views)
+  } else {
+    print("Try to be more visible!")
+    return(0)
+  }
+}
+
+# Call the interpret function twice
+linkedin <- linkedin[complete.cases(linkedin)]
+facebook <- facebook[complete.cases(facebook)]
+interpret(linkedin[1])
+```
+
+```
+## [1] "You're popular!"
+```
+
+```
+## [1] 16
+```
+
+```r
+interpret(facebook[2])
+```
+
+```
+## [1] "Try to be more visible!"
+```
+
+```
+## [1] 0
+```
+
+## Still more advanced
+
+
+```r
+# The linkedin and facebook vectors have already been created for you
+linkedin <- c(16, 9, 13, 5, 2, 17, 14)
+facebook <- c(17, 7, 5, 16, 8, 13, 14)
+
+# The interpret() can be used inside interpret_all()
+interpret <- function(num_views) {
+  if (num_views > 15) {
+    print("You're popular!")
+    return(num_views)
+  } else {
+    print("Try to be more visible!")
+    return(0)
+  }
+}
+
+# Define the interpret_all() function
+# views: vector with data to interpret
+# return_sum: return total number of views on popular days?
+interpret_all <- function(views, return_sum = TRUE) {
+  count <- 0
+
+  for (v in views) {
+    count = count + interpret(v)
+  }
+
+  if (return_sum == TRUE) {
+    return(count)
+  } else {
+    return(NULL)
+  }
+}
+
+# Call the interpret_all() function on both linkedin and facebook
+interpret_all(linkedin)
+```
+
+```
+## [1] "You're popular!"
+## [1] "Try to be more visible!"
+## [1] "Try to be more visible!"
+## [1] "Try to be more visible!"
+## [1] "Try to be more visible!"
+## [1] "You're popular!"
+## [1] "Try to be more visible!"
+```
+
+```
+## [1] 33
+```
+
+```r
+interpret_all(facebook)
+```
+
+```
+## [1] "You're popular!"
+## [1] "Try to be more visible!"
+## [1] "Try to be more visible!"
+## [1] "You're popular!"
+## [1] "Try to be more visible!"
+## [1] "Try to be more visible!"
+## [1] "Try to be more visible!"
+```
+
+```
+## [1] 33
+```
+
+## R packages
+
+
+```r
+# look at the currently attached packages 
+search()
+```
+
+```
+## [1] ".GlobalEnv"        "package:stats"     "package:graphics" 
+## [4] "package:grDevices" "package:utils"     "package:datasets" 
+## [7] "package:methods"   "Autoloads"         "package:base"
+```
+
+```r
+# Load the ggplot2 package
+library(ggplot2)
+
+# Retry the qplot() function
+qplot(mtcars$wt, mtcars$hp)
+```
+
+![](02intermR_files/figure-html/unnamed-chunk-27-1.png)<!-- -->
+
+```r
+# Check out the currently attached packages again
+search()
+```
+
+```
+##  [1] ".GlobalEnv"        "package:ggplot2"   "package:stats"    
+##  [4] "package:graphics"  "package:grDevices" "package:utils"    
+##  [7] "package:datasets"  "package:methods"   "Autoloads"        
+## [10] "package:base"
+```
+
+## The apply family
+
+## lapply()
+
+## Use lapply with a built-in R function
+
+
+```r
+# The vector pioneers has already been created for you
+pioneers <- c("GAUSS:1777", "BAYES:1702", "PASCAL:1623", "PEARSON:1857")
+
+# Split names from birth year
+split_math <- strsplit(pioneers, split = ":")
+
+# Convert to lowercase strings: split_low
+split_low <- lapply(split_math, tolower)
+
+# Take a look at the structure of split_low
+str(split_low)
+```
+
+```
+## List of 4
+##  $ : chr [1:2] "gauss" "1777"
+##  $ : chr [1:2] "bayes" "1702"
+##  $ : chr [1:2] "pascal" "1623"
+##  $ : chr [1:2] "pearson" "1857"
+```
+
+## Use lapply with your own function
+
+
+```r
+# Code from previous exercise:
+pioneers <- c("GAUSS:1777", "BAYES:1702", "PASCAL:1623", "PEARSON:1857")
+split <- strsplit(pioneers, split = ":")
+split_low <- lapply(split, tolower)
+
+# Write function select_first()
+select_first <- function(x) {
+  x[1]
+}
+
+# Apply select_first() over split_low: names
+names <- lapply(split_low, select_first)
+
+# Write function select_second()
+select_second <- function(x) {
+  x[2]
+}
+
+# Apply select_second() over split_low: years
+years <- lapply(split_low, select_second)
+```
+
+## lapply and anonymous functions
+
+
+```r
+# split_low has been created for you
+split_low
+```
+
+```
+## [[1]]
+## [1] "gauss" "1777" 
+## 
+## [[2]]
+## [1] "bayes" "1702" 
+## 
+## [[3]]
+## [1] "pascal" "1623"  
+## 
+## [[4]]
+## [1] "pearson" "1857"
+```
+
+```r
+# Transform: use anonymous function inside lapply
+names <- lapply(split_low, function(x) {x[1]})
+
+# Transform: use anonymous function inside lapply
+years <- lapply(split_low, function(x) {x[2]})
+```
+
+## Use lapply with additional arguments
+
+
+```r
+# Definition of split_low
+pioneers <- c("GAUSS:1777", "BAYES:1702", "PASCAL:1623", "PEARSON:1857")
+split <- strsplit(pioneers, split = ":")
+split_low <- lapply(split, tolower)
+
+# Generic select function
+select_el <- function(x, index) {
+  x[index]
+}
+
+# Use lapply() twice on split_low: names and years
+names <- lapply(split_low, select_el, index = 1)
+years <- lapply(split_low, select_el, index = 2)
+```
 
