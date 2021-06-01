@@ -1,7 +1,7 @@
 ---
 title: "02 Intermediate R"
 author: "Andi"
-Last updated: "29 May, 2021"
+Last updated: "01 June, 2021"
 output: 
   html_document: 
     keep_md: yes
@@ -1099,5 +1099,1027 @@ select_el <- function(x, index) {
 # Use lapply() twice on split_low: names and years
 names <- lapply(split_low, select_el, index = 1)
 years <- lapply(split_low, select_el, index = 2)
+```
+
+## Apply functions that return NULL
+
+In all of the previous exercises, it was assumed that the functions that were applied over vectors and lists actually returned a meaningful result. For example, the `tolower()` function simply returns the strings with the characters in lowercase. This won't always be the case. Suppose you want to display the structure of every element of a list. You could use the `str()` function for this, which returns `NULL`:
+
+
+```r
+lapply(list(1, "a", TRUE), str)
+```
+
+```
+##  num 1
+##  chr "a"
+##  logi TRUE
+```
+
+```
+## [[1]]
+## NULL
+## 
+## [[2]]
+## NULL
+## 
+## [[3]]
+## NULL
+```
+
+This call actually returns a list, the same size as the input list, containing all `NULL` values. On the other hand calling
+
+
+```r
+str(TRUE)
+```
+
+```
+##  logi TRUE
+```
+
+on its own prints only the structure of the logical to the console, not `NULL`. That's because `str()` uses `invisible()` behind the scenes, which returns an invisible copy of the return value, `NULL` in this case. This prevents it from being printed when the result of `str()` is not assigned.
+
+What will the following code chunk return? Try to reason about the result before executing!
+
+```r
+lapply(split_low, function(x) {
+  if (nchar(x[1]) > 5) {
+    return(NULL)
+  } else {
+    return(x[2])
+  }
+})
+```
+
+```
+## [[1]]
+## [1] "1777"
+## 
+## [[2]]
+## [1] "1702"
+## 
+## [[3]]
+## NULL
+## 
+## [[4]]
+## NULL
+```
+
+## sapply
+
+- short for "simplify / simplified apply"
+
+- `sapply(cities, nchar, USE.NAMES = FALSE)` removes city names from the output.
+
+- usually , the output of `sapply` is a vector. However, it will return a list if the simplification is not possible.  in this case, we can consider using `vapply`
+
+## How to use sapply
+
+
+```r
+# Define temperature dataset
+temp <- list(c(3, 7, 9, 6, -1), c(6, 9, 12, 13, 5), c(4, 8, 3, -1, -3
+), c(1, 4, 7, 2, -2), c(5, 7, 9, 4, 2), c(-3, 5, 8, 9, 4), c(3, 
+6, 9, 4, 1))
+
+
+# Use lapply() to find each day's minimum temperature
+lapply(temp, min)
+```
+
+```
+## [[1]]
+## [1] -1
+## 
+## [[2]]
+## [1] 5
+## 
+## [[3]]
+## [1] -3
+## 
+## [[4]]
+## [1] -2
+## 
+## [[5]]
+## [1] 2
+## 
+## [[6]]
+## [1] -3
+## 
+## [[7]]
+## [1] 1
+```
+
+```r
+# Use sapply() to find each day's minimum temperature
+sapply(temp, min)
+```
+
+```
+## [1] -1  5 -3 -2  2 -3  1
+```
+
+```r
+# Use lapply() to find each day's maximum temperature
+lapply(temp, max)
+```
+
+```
+## [[1]]
+## [1] 9
+## 
+## [[2]]
+## [1] 13
+## 
+## [[3]]
+## [1] 8
+## 
+## [[4]]
+## [1] 7
+## 
+## [[5]]
+## [1] 9
+## 
+## [[6]]
+## [1] 9
+## 
+## [[7]]
+## [1] 9
+```
+
+```r
+# Use sapply() to find each day's maximum temperature
+sapply(temp, max)
+```
+
+```
+## [1]  9 13  8  7  9  9  9
+```
+
+## sapply with your own function
+
+
+```r
+# Finish function definition of extremes_avg
+extremes_avg <- function(x) {
+  ( min(x) + max(x) ) / 2
+}
+
+# Apply extremes_avg() over temp using sapply()
+sapply(temp, extremes_avg)
+```
+
+```
+## [1] 4.0 9.0 2.5 2.5 5.5 3.0 5.0
+```
+
+```r
+# Apply extremes_avg() over temp using lapply()
+lapply(temp, extremes_avg)
+```
+
+```
+## [[1]]
+## [1] 4
+## 
+## [[2]]
+## [1] 9
+## 
+## [[3]]
+## [1] 2.5
+## 
+## [[4]]
+## [1] 2.5
+## 
+## [[5]]
+## [1] 5.5
+## 
+## [[6]]
+## [1] 3
+## 
+## [[7]]
+## [1] 5
+```
+
+## sapply with function returning vector
+
+
+```r
+# Create a function that returns min and max of a vector: extremes
+extremes <- function(x) {
+  c(min = min(x), max = max(x))
+}
+
+# Apply extremes() over temp with sapply()
+sapply(temp, extremes)
+```
+
+```
+##     [,1] [,2] [,3] [,4] [,5] [,6] [,7]
+## min   -1    5   -3   -2    2   -3    1
+## max    9   13    8    7    9    9    9
+```
+
+```r
+# Apply extremes() over temp with lapply()
+lapply(temp, extremes)
+```
+
+```
+## [[1]]
+## min max 
+##  -1   9 
+## 
+## [[2]]
+## min max 
+##   5  13 
+## 
+## [[3]]
+## min max 
+##  -3   8 
+## 
+## [[4]]
+## min max 
+##  -2   7 
+## 
+## [[5]]
+## min max 
+##   2   9 
+## 
+## [[6]]
+## min max 
+##  -3   9 
+## 
+## [[7]]
+## min max 
+##   1   9
+```
+
+## sapply can't simplify, now what?
+
+
+```r
+# Definition of below_zero()
+below_zero <- function(x) {
+  return(x[x < 0])
+}
+
+# Apply below_zero over temp using sapply(): freezing_s
+freezing_s <- sapply(temp, below_zero)
+
+# Apply below_zero over temp using lapply(): freezing_l
+freezing_l <- lapply(temp, below_zero)
+
+# Are freezing_s and freezing_l identical?
+identical(freezing_s, freezing_l)
+```
+
+```
+## [1] TRUE
+```
+
+Note: Given that the length of the output of `below_zero()` changes for different input vectors, `sapply()` is not able to nicely convert the output of `lapply()` to a nicely formatted matrix. Instead, the output values of `sapply()` and `lapply()` are exactly the same, as shown by the TRUE output of `identical()`.
+
+## sapply with functions that return NULL
+
+
+```r
+# temp is already available in the workspace
+
+# Definition of print_info()
+print_info <- function(x) {
+  cat("The average temperature is", mean(x), "\n")
+}
+
+# Apply print_info() over temp using sapply()
+sapply(temp, print_info)
+```
+
+```
+## The average temperature is 4.8 
+## The average temperature is 9 
+## The average temperature is 2.2 
+## The average temperature is 2.4 
+## The average temperature is 5.4 
+## The average temperature is 4.6 
+## The average temperature is 4.6
+```
+
+```
+## [[1]]
+## NULL
+## 
+## [[2]]
+## NULL
+## 
+## [[3]]
+## NULL
+## 
+## [[4]]
+## NULL
+## 
+## [[5]]
+## NULL
+## 
+## [[6]]
+## NULL
+## 
+## [[7]]
+## NULL
+```
+
+```r
+# Apply print_info() over temp using lapply()
+lapply(temp, print_info)
+```
+
+```
+## The average temperature is 4.8 
+## The average temperature is 9 
+## The average temperature is 2.2 
+## The average temperature is 2.4 
+## The average temperature is 5.4 
+## The average temperature is 4.6 
+## The average temperature is 4.6
+```
+
+```
+## [[1]]
+## NULL
+## 
+## [[2]]
+## NULL
+## 
+## [[3]]
+## NULL
+## 
+## [[4]]
+## NULL
+## 
+## [[5]]
+## NULL
+## 
+## [[6]]
+## NULL
+## 
+## [[7]]
+## NULL
+```
+
+Note: Notice here that, quite surprisingly, sapply() does not simplify the list of `NULL's`. That's because the 'vector-version' of a list of `NULL's` would simply be a `NULL`, which is no longer a vector with the same length as the input. Proceed to the next exercise.
+
+## Reverse engineering sapply
+
+Imagine the output of the following code before executing.
+
+
+```r
+sapply(list(runif (10), runif (10)), 
+       function(x) c(min = min(x), mean = mean(x), max = max(x)))
+```
+
+```
+##            [,1]       [,2]
+## min  0.03935214 0.05259505
+## mean 0.53792598 0.44875058
+## max  0.89194289 0.68974503
+```
+
+## vapply
+
+## Use vapply
+
+
+```r
+# Definition of basics()
+basics <- function(x) {
+  c(min = min(x), mean = mean(x), max = max(x))
+}
+
+# Apply basics() over temp using vapply()
+vapply(temp, basics, numeric(3))
+```
+
+```
+##      [,1] [,2] [,3] [,4] [,5] [,6] [,7]
+## min  -1.0    5 -3.0 -2.0  2.0 -3.0  1.0
+## mean  4.8    9  2.2  2.4  5.4  4.6  4.6
+## max   9.0   13  8.0  7.0  9.0  9.0  9.0
+```
+
+```r
+# Definition of the basics() function
+basics <- function(x) {
+  c(min = min(x), mean = mean(x), median = median(x), max = max(x))
+}
+
+# Apply basics() over temp again using vapply()
+vapply(temp, basics, numeric(4))
+```
+
+```
+##        [,1] [,2] [,3] [,4] [,5] [,6] [,7]
+## min    -1.0    5 -3.0 -2.0  2.0 -3.0  1.0
+## mean    4.8    9  2.2  2.4  5.4  4.6  4.6
+## median  6.0    9  3.0  2.0  5.0  5.0  4.0
+## max     9.0   13  8.0  7.0  9.0  9.0  9.0
+```
+
+## From sapply to vapply
+
+
+```r
+sapply(temp, max)
+```
+
+```
+## [1]  9 13  8  7  9  9  9
+```
+
+```r
+sapply(temp, function(x, y) { mean(x) > y }, y = 5)
+```
+
+```
+## [1] FALSE  TRUE FALSE FALSE  TRUE FALSE FALSE
+```
+
+```r
+# Convert to vapply() expression
+vapply(temp, max, numeric(1))
+```
+
+```
+## [1]  9 13  8  7  9  9  9
+```
+
+```r
+# Convert to vapply() expression
+vapply(temp, function(x, y) { mean(x) > y }, y = 5, logical(1))
+```
+
+```
+## [1] FALSE  TRUE FALSE FALSE  TRUE FALSE FALSE
+```
+
+## Useful Functions
+
+## Mathematical utilities
+
+
+```r
+# The errors vector has already been defined for you
+errors <- c(1.9, -2.6, 4.0, -9.5, -3.4, 7.3)
+
+# Sum of absolute rounded values of errors
+sum(abs(round(errors)))
+```
+
+```
+## [1] 29
+```
+
+## Data Utilities
+
+
+```r
+# The linkedin and facebook lists have already been created for you
+linkedin <- list(16, 9, 13, 5, 2, 17, 14)
+facebook <- list(17, 7, 5, 16, 8, 13, 14)
+
+# Convert linkedin and facebook to a vector: li_vec and fb_vec
+li_vec<-unlist(linkedin)
+fb_vec<-unlist(facebook)
+
+# Append fb_vec to li_vec: social_vec
+social_vec<-append(li_vec, fb_vec)
+
+# Sort social_vec
+sort(social_vec, decreasing = TRUE)
+```
+
+```
+##  [1] 17 17 16 16 14 14 13 13  9  8  7  5  5  2
+```
+
+## Beat Gauss using R
+
+
+```r
+# Create first sequence: seq1
+seq1 <- seq(1, 500, by = 3)
+
+# Create second sequence: seq2
+seq2 <- seq(1200, 900, by = -7)
+
+# Calculate total sum of the sequences
+sum(seq1, seq2)
+```
+
+```
+## [1] 87029
+```
+
+## Regular Expressions
+
+## grepl & grep
+
+
+```r
+# The emails vector has already been defined for you
+emails <- c("john.doe@ivyleague.edu", "education@world.gov", "dalai.lama@peace.org",
+            "invalid.edu", "quant@bigdatacollege.edu", "cookie.monster@sesame.tv")
+
+# Use grepl() to match for "edu"
+grepl(pattern = "edu", x = emails)
+```
+
+```
+## [1]  TRUE  TRUE FALSE  TRUE  TRUE FALSE
+```
+
+```r
+# Use grep() to match for "edu", save result to hits
+hits <- grep(patter = "edu", x = emails)
+
+# Subset emails using hits
+emails[hits]
+```
+
+```
+## [1] "john.doe@ivyleague.edu"   "education@world.gov"     
+## [3] "invalid.edu"              "quant@bigdatacollege.edu"
+```
+
+## grepl & grep (2)
+
+
+You can use the caret, `^`, and the dollar sign, `$` to match the content located in the start and end of a string, respectively. This could take us one step closer to a correct pattern for matching only the ".edu" email addresses from our list of emails. But there's more that can be added to make the pattern more robust:
+
+- `@`, because a valid email must contain an at-sign.
+
+- `.*`, which matches any character (.) zero or more times (*). Both the dot and the asterisk are metacharacters. You can use them to match any character between the at-sign and the ".edu" portion of an email address.
+
+- `\\.edu$`, to match the ".edu" part of the email at the end of the string. The `\\` part escapes the dot: it tells R that you want to use the `.` as an actual character.
+
+
+```r
+# The emails vector has already been defined for you
+emails <- c("john.doe@ivyleague.edu", "education@world.gov", "dalai.lama@peace.org",
+            "invalid.edu", "quant@bigdatacollege.edu", "cookie.monster@sesame.tv")
+
+# Use grepl() to match for .edu addresses more robustly
+grepl(pattern = "@.*\\.edu$", x = emails)
+```
+
+```
+## [1]  TRUE FALSE FALSE FALSE  TRUE FALSE
+```
+
+```r
+# Use grep() to match for .edu addresses more robustly, save result to hits
+hits <- grep(pattern = "@.*\\.edu$", x = emails)
+
+# Subset emails using hits
+emails[hits]
+```
+
+```
+## [1] "john.doe@ivyleague.edu"   "quant@bigdatacollege.edu"
+```
+
+## sub & gsub
+
+While `grep()` and `grepl()` were used to simply check whether a regular expression could be matched with a character vector, `sub()` and `gsub()` take it one step further: you can specify a replacement argument. If inside the character vector `x`, the regular expression `pattern` is found, the matching element(s) will be replaced with `replacement`. `sub()` only replaces the first match, whereas `gsub()` replaces all matches.
+
+
+```r
+# The emails vector has already been defined for you
+emails <- c("john.doe@ivyleague.edu", "education@world.gov", "global@peace.org",
+            "invalid.edu", "quant@bigdatacollege.edu", "cookie.monster@sesame.tv")
+
+# Use sub() to convert the email domains to datacamp.edu
+sub(pattern = "@.*\\.edu$", replacement = "@datacamp.edu", x = emails)
+```
+
+```
+## [1] "john.doe@datacamp.edu"    "education@world.gov"     
+## [3] "global@peace.org"         "invalid.edu"             
+## [5] "quant@datacamp.edu"       "cookie.monster@sesame.tv"
+```
+
+## sub & gsub (2)
+
+Regular expressions are a typical concept that you'll learn by doing and by seeing other examples. Before you rack your brains over the regular expression in this exercise, have a look at the new things that will be used:
+
+- `.*`: A usual suspect! It can be read as "any character that is matched zero or more times".
+
+- `\\s`: Match a space. The "s" is normally a character, escaping it (`\\`) makes it a metacharacter.
+
+`[0-9]+`: Match the numbers 0 to 9, at least once (+).
+`([0-9]+)`: The parentheses are used to make parts of the matching string available to define the replacement. The `\\1` in the replacement argument of `sub()` gets set to the string that is captured by the regular expression `[0-9]+`.
+
+
+```r
+awards <- c("Won 1 Oscar.",
+  "Won 1 Oscar. Another 9 wins & 24 nominations.",
+  "1 win and 2 nominations.",
+  "2 wins & 3 nominations.",
+  "Nominated for 2 Golden Globes. 1 more win & 2 nominations.",
+  "4 wins & 1 nomination.")
+
+sub(".*\\s([0-9]+)\\snomination.*$", "\\1", awards)
+```
+
+```
+## [1] "Won 1 Oscar." "24"           "2"            "3"            "2"           
+## [6] "1"
+```
+What exactly happened? The `([0-9]+)` selects the entire number that comes before the word “nomination” in the string, and the entire match gets replaced by this number because of the `\\1` that reference to the content inside the parentheses. 
+
+## Right here, right now
+
+
+```r
+# Get the current date: today
+today <- Sys.Date()
+
+# See what today looks like under the hood
+unclass(today)
+```
+
+```
+## [1] 18779
+```
+
+```r
+# Get the current time: now
+now <- Sys.time()
+
+# See what now looks like under the hood
+unclass(now)
+```
+
+```
+## [1] 1622566772
+```
+
+## Create and format dates
+
+To create a `Date` object from a simple character string in R, you can use the `as.Date()` function. The character string has to obey a format that can be defined using a set of symbols (the examples correspond to 13 January, 1982):
+
+`%Y`: 4-digit year (1982)
+`%y`: 2-digit year (82)
+`%m`: 2-digit month (01)
+`%d`: 2-digit day of the month (13)
+`%A`: weekday (Wednesday)
+`%a`: abbreviated weekday (Wed)
+`%B`: month (January)
+`%b`: abbreviated month (Jan)
+
+The following R commands will all create the same `Date` object for the 13th day in January of 1982:
+
+
+```r
+as.Date("1982-01-13")
+```
+
+```
+## [1] "1982-01-13"
+```
+
+```r
+as.Date("Jan-13-82", format = "%b-%d-%y")
+```
+
+```
+## [1] "1982-01-13"
+```
+
+```r
+as.Date("13 January, 1982", format = "%d %B, %Y")
+```
+
+```
+## [1] "1982-01-13"
+```
+
+Notice that the first line here did not need a format argument, because by default R matches your character string to the formats `"%Y-%m-%d"` or `"%Y/%m/%d"`.
+
+In addition to creating dates, you can also convert dates to character strings that use a different date notation. For this, you use the `format()` function. Try the following lines of code:
+
+
+```r
+today <- Sys.Date()
+format(Sys.Date(), format = "%d %B, %Y")
+```
+
+```
+## [1] "01 June, 2021"
+```
+
+```r
+format(Sys.Date(), format = "Today is a %A!")
+```
+
+```
+## [1] "Today is a Tuesday!"
+```
+
+## Create and format dates
+
+
+```r
+# Definition of character strings representing dates
+str1 <- "May 23, '96"
+str2 <- "2012-03-15"
+str3 <- "30/January/2006"
+
+# Convert the strings to dates: date1, date2, date3
+date1 <- as.Date(str1, format = "%b %d, '%y")
+date2 <- as.Date(str2, format = "%Y-%m-%d")
+date3 <- as.Date(str3, format = "%d/%B/%Y")
+
+# Convert dates to formatted strings
+# select the weekday
+format(date1, "%A")
+```
+
+```
+## [1] "Thursday"
+```
+
+```r
+# select the day of the month
+format(date2, "%d")
+```
+
+```
+## [1] "15"
+```
+
+```r
+# select the abbreviated month and the 4-digit year, separated by a space
+format(date3, "%b %Y")
+```
+
+```
+## [1] "Jan 2006"
+```
+
+## Create and format times
+
+Similar to working with dates, you can use `as.POSIXct()` to convert from a character string to a `POSIXct` object, and `format()` to convert from a `POSIXct` object to a character string. Again, you have a wide variety of symbols. For a full list of conversion symbols, consult the `strptime` documentation.
+
+
+```r
+# ?strptime
+```
+
+## Create and format times
+
+
+```r
+# Definition of character strings representing times
+str1 <- "May 23, '96 hours:23 minutes:01 seconds:45"
+str2 <- "2012-3-12 14:23:08"
+
+# Convert the strings to POSIXct objects: time1, time2
+time1 <- as.POSIXct(str1, format = "%B %d, '%y hours:%H minutes:%M seconds:%S")
+
+time2 <- as.POSIXct(str2, format = "%Y-%m-%d %H:%M:%S")
+
+# Convert times to formatted strings
+# create a string from time1 containing only the minutes.
+format(time1, "%M")
+```
+
+```
+## [1] "01"
+```
+
+```r
+# From time2, extract the hours and minutes as "hours:minutes AM/PM"
+format(time2, "%I:%M %p")
+```
+
+```
+## [1] "02:23 PM"
+```
+
+## Calculations with Dates
+
+
+```r
+today <- Sys.Date()
+today + 1
+```
+
+```
+## [1] "2021-06-02"
+```
+
+```r
+today - 1
+```
+
+```
+## [1] "2021-05-31"
+```
+
+```r
+as.Date("2015-03-12") - as.Date("2015-02-27")
+```
+
+```
+## Time difference of 13 days
+```
+
+```r
+# day1, day2, day3, day4 and day5 are already available in the workspace
+day1<-structure(18760, class = "Date")
+day2<-structure(18762, class = "Date")
+day3<-structure(18767, class = "Date")
+day4<-structure(18773, class = "Date")
+day5<-structure(18778, class = "Date")
+
+day1; day2; day3; day4; day5
+```
+
+```
+## [1] "2021-05-13"
+```
+
+```
+## [1] "2021-05-15"
+```
+
+```
+## [1] "2021-05-20"
+```
+
+```
+## [1] "2021-05-26"
+```
+
+```
+## [1] "2021-05-31"
+```
+
+```r
+# Difference between last and first pizza day
+day5 - day1
+```
+
+```
+## Time difference of 18 days
+```
+
+```r
+# Create vector pizza
+pizza <- c(day1, day2, day3, day4, day5)
+
+# Create differences between consecutive pizza days: day_diff
+day_diff = diff(pizza)
+
+# Average period between two consecutive pizza days
+mean(day_diff)
+```
+
+```
+## Time difference of 4.5 days
+```
+
+## Calculations with Times
+
+Try to experiment with this code to increase or decrease `POSIXct` objects:
+
+
+```r
+now <- Sys.time()
+now + 3600          # add an hour
+```
+
+```
+## [1] "2021-06-01 13:59:33 EDT"
+```
+
+```r
+now - 3600 * 24     # subtract a day
+```
+
+```
+## [1] "2021-05-31 12:59:33 EDT"
+```
+
+Adding or subtracting time objects is also straightforward:
+
+
+```r
+birth <- as.POSIXct("1879-03-14 14:37:23")
+death <- as.POSIXct("1955-04-18 03:47:12")
+einstein <- death - birth
+einstein
+```
+
+```
+## Time difference of 27792.55 days
+```
+
+
+```r
+# login and logout are already defined in the workspace
+
+login <- structure(c(1621246684.74737, 1621674858.36921, 1621686111.68576, 
+1621687044.83761, 1621892275.89139), class = c("POSIXct", "POSIXt"
+))
+
+logout <- structure(c(1621248989.86555, 1621674892.55393, 1621686948.86758, 
+1621689442.73914, 1621894127.1955), class = c("POSIXct", "POSIXt"
+))
+
+login; logout
+```
+
+```
+## [1] "2021-05-17 06:18:04 EDT" "2021-05-22 05:14:18 EDT"
+## [3] "2021-05-22 08:21:51 EDT" "2021-05-22 08:37:24 EDT"
+## [5] "2021-05-24 17:37:55 EDT"
+```
+
+```
+## [1] "2021-05-17 06:56:29 EDT" "2021-05-22 05:14:52 EDT"
+## [3] "2021-05-22 08:35:48 EDT" "2021-05-22 09:17:22 EDT"
+## [5] "2021-05-24 18:08:47 EDT"
+```
+
+```r
+# Calculate the difference between login and logout: time_online
+time_online = logout - login
+
+# Inspect the variable time_online
+time_online
+```
+
+```
+## Time differences in secs
+## [1] 2305.11818   34.18472  837.18182 2397.90153 1851.30411
+```
+
+```r
+# Calculate the total time online
+sum(time_online)
+```
+
+```
+## Time difference of 7425.69 secs
+```
+
+```r
+# Calculate the average time online
+mean(time_online)
+```
+
+```
+## Time difference of 1485.138 secs
+```
+
+## Time is of the essence
+
+
+```r
+astro <- structure(c("20-Mar-2015", "25-Jun-2015", "23-Sep-2015", "22-Dec-2015"
+), .Names = c("spring", "summer", "fall", "winter"))
+
+meteo <- structure(c("March 1, 15", "June 1, 15", "September 1, 15", "December 1, 15"
+), .Names = c("spring", "summer", "fall", "winter"))
+
+astro; meteo
+```
+
+```
+##        spring        summer          fall        winter 
+## "20-Mar-2015" "25-Jun-2015" "23-Sep-2015" "22-Dec-2015"
+```
+
+```
+##            spring            summer              fall            winter 
+##     "March 1, 15"      "June 1, 15" "September 1, 15"  "December 1, 15"
+```
+
+```r
+# Convert astro to vector of Date objects: astro_dates
+astro_dates <- as.Date(astro, format = "%d-%b-%Y")
+
+# Convert meteo to vector of Date objects: meteo_dates
+meteo_dates <- as.Date(meteo, format = "%B %d, %y")
+
+# Calculate the maximum absolute difference between astro_dates and meteo_dates
+max(abs(astro_dates - meteo_dates))
+```
+
+```
+## Time difference of 24 days
 ```
 
